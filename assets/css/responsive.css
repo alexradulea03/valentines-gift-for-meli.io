@@ -39,11 +39,14 @@
 
     /* Ensure gallery sits nicely and is scrollable on very small screens */
     .gallery {
-        top: 48%;
-        max-height: 75vh;
+        /* restore true centering and eliminate background bleed on phones */
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-height: 86vh;
         width: calc(100% - 2rem);
         left: 50%;
-        transform: translate(-50%, 0);
+        background: #ffffff; /* make fully opaque to remove pink band */
+        padding: 0.5rem;
     }
     
     .gift-container {

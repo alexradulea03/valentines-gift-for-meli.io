@@ -12,9 +12,21 @@ let bgMusic = null;
 // Lazy-init audio (created on first user gesture to satisfy mobile autoplay restrictions)
 function initAudio() {
     if (bgMusic) return;
-    bgMusic = new Audio('assets/audio/background-music.mp3');
-    bgMusic.loop = true;
-    bgMusic.preload = 'auto';
+
+    // Prefer an inline <audio> element (better compatibility on iOS/Safari)
+    const inlineEl = document.getElementById('bg-audio');
+    if (inlineEl) {
+        bgMusic = inlineEl;
+        bgMusic.loop = true;
+        bgMusic.preload = 'auto';
+        try { bgMusic.setAttribute('playsinline', ''); } catch(e) {}
+    } else {
+        // fallback to programmatic Audio object
+        bgMusic = new Audio('assets/audio/background-music.mp3');
+        bgMusic.loop = true;
+        bgMusic.preload = 'auto';
+        try { bgMusic.playsInline = true; } catch(e) {}
+    }
 
     // keep UI state in sync if playback changes elsewhere
     bgMusic.addEventListener('playing', () => {

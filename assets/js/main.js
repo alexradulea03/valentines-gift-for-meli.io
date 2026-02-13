@@ -108,12 +108,23 @@ if (playMusicButton) {
 giftBox.addEventListener('click', () => {
     if (!isOpen) {
         giftBox.classList.add('open');
+        
+        // Mobile Audio Insurance: Try playing here again just in case
+        if (bgMusic && bgMusic.paused) {
+            bgMusic.play().catch(() => { /* silent fail */ });
+        }
+
         setTimeout(() => {
             gallery.classList.add('show');
+            
+            // FIX: Force the gallery to start at the very top of the photos
+            gallery.scrollTop = 0; 
+            
             createHeartBurst();
             playConfetti();
         }, 1000);
         isOpen = true;
+        // Inside the giftBox click listener
     }
 });
 
@@ -247,14 +258,7 @@ window.addEventListener('load', () => {
     document.body.style.opacity = '1';
 });
 
-// Add resize handler
-window.addEventListener('resize', () => {
-    if (window.innerWidth < 768) {
-        gallery.style.height = '70vh';
-    } else {
-        gallery.style.height = '80vh';
-    }
-});
+
 
 
 const modal = document.getElementById('imageModal');
@@ -264,40 +268,19 @@ const modalDescription = document.querySelector('.modal-description');
 const modalQuote = document.querySelector('.modal-quote');
 const closeModal = document.querySelector('.close-modal');
 
-// Image content data
-// const imageContent = {
-//     'romantic-moment-1': {
-//         title: 'Our First Date',
-//         description: 'The moment our hearts first danced together, creating memories that would last a lifetime.',
-//         quote: '"Every love story is beautiful, but ours is my favorite."'
-//     },
-//     'romantic-moment-2': {
-//         title: 'Beautiful Sunset Together',
-//         description: 'Watching the sun paint the sky in shades of love, while our hearts grew closer.',
-//         quote: '"The best thing to hold onto in life is each other."'
-//     },
-//     'romantic-moment-3': {
-//         title: 'Perfect Evening',
-//         description: 'Under the moonlight, every moment with you becomes magical and unforgettable.',
-//         quote: '"In your arms is where I belong."'
-//     },
-//     'romantic-moment-4': {
-//         title: 'Sweet Memories',
-//         description: 'Each smile, each laugh, each tender moment builds our beautiful story together.',
-//         quote: '"You are my today and all of my tomorrows."'
-//     },
-//     'romantic-moment-5': {
-//         title: 'Sweet Memories',
-//         description: 'Each smile, each laugh, each tender moment builds our beautiful story together.',
-//         quote: '"You are my today and all of my tomorrows."'
-//     },
-//     'romantic-moment-6': {
-//         title: 'Sweet Memories',
-//         description: 'Each smile, each laugh, each tender moment builds our beautiful story together.',
-//         quote: '"You are my today and all of my tomorrows."'
-//     },
-
-// };
+const imageContent = {
+    'romantic-moment-1': { title: 'Our First Date', description: 'The moment our hearts first danced together.', quote: '"Every love story is beautiful."' },
+    'romantic-moment-2': { title: 'Beautiful Sunset', description: 'Watching the sky paint shades of love.', quote: '"The best thing to hold onto is each other."' },
+    'romantic-moment-3': { title: 'Perfect Evening', description: 'Under the moonlight, everything is magical.', quote: '"In your arms is where I belong."' },
+    'romantic-moment-4': { title: 'Sweet Memories', description: 'Building our beautiful story together.', quote: '"You are my today and all my tomorrows."' },
+    'romantic-moment-5': { title: 'Together Forever', description: 'Side by side, heart to heart.', quote: '"I love you more than words."' },
+    'romantic-moment-6': { title: 'Crazy Fun', description: 'Life is better when we laugh.', quote: '"You make my heart smile."' },
+    'romantic-moment-7': { title: 'Beautiful Night', description: 'Pizza and you, the perfect combo.', quote: '"Home is wherever I am with you."' },
+    'romantic-moment-8': { title: 'Always Smiling', description: 'I never want to let go.', quote: '"You are my sunshine."' },
+    'romantic-moment-9': { title: 'Adventure', description: 'Exploring the world with my favorite person.', quote: '"Let\'s get lost together."' },
+    'romantic-moment-10': { title: 'Video Memory', description: 'A special moment caught on film.', quote: '"Love in motion."' },
+    'romantic-moment-11': { title: 'Cool Times', description: 'Just being us.', quote: '"Forever us."' }
+};
 
 // Update gallery item click listeners
 galleryItems.forEach((item, index) => {
@@ -305,16 +288,19 @@ galleryItems.forEach((item, index) => {
         const imageId = `romantic-moment-${index + 1}`;
         const content = imageContent[imageId];
         
-        modalImage.src = item.querySelector('img').src;
-        modalImage.alt = item.querySelector('img').alt;
+        // Find EITHER an image or a video
+        const media = item.querySelector('img, video');
+        if (!media || !content) return; // Guard against missing data
+
+        modalImage.src = media.src;
         modalTitle.textContent = content.title;
         modalDescription.textContent = content.description;
         modalQuote.textContent = content.quote;
         
-        modal.style.display = 'block';
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
+        if (modal) {
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
         
         createHeartBurst();
     });
